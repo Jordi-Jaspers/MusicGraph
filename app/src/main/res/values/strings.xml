@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MusicBrains</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="song">Song</string>
+    <string name="what_are_you_searching">What are you searching?</string>
+    <string name="error_message">Failed to get result, please try again later.</string>
 </resources>
