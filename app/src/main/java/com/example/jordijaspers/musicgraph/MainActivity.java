@@ -17,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jordijaspers.musicgraph.Utilities.JSONInputTest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -81,13 +83,25 @@ public class MainActivity extends AppCompatActivity {
         errorMessage = (TextView) findViewById(R.id.tv_error_message);
         loadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        mCursor = getJSONCursor(sample_response);
+        JSONInputTest test = new JSONInputTest();                                     //TESTEN!!!
+        mCursor = getJSONCursor(test.getJSONInput());
         mAdapter = new Adapter(AMOUNT, this, mCursor);
 
         Log.i(TAG, "onCreate: Setting the Layout & linking the Adapter for the recycleView.");
         mResults = (RecyclerView) findViewById(R.id.rv_artist_results);
         mResults.setLayoutManager(new LinearLayoutManager(this));
         mResults.setAdapter(mAdapter);
+
+    }
+
+    /**
+     * Parse the input of JSONobject to a readable string.
+     *
+     * @param JSONString JSONString
+     * @throws JSONException Throws exception when null.
+     */
+    public void JSONParse(String JSONString) throws JSONException {
+
 
     }
 

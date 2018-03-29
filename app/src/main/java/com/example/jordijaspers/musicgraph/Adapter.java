@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Adapter Class for the recycleView
  */
@@ -33,13 +29,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
         this.mContext = context;
         this.mCursor = cursor;
         this.numberOfItems = totalItems;
-    }
-
-    public void getResults(String JSONString) throws JSONException {
-        JSONObject JSONInput = new JSONObject(JSONString);
-        JSONObject results =  JSONInvoer.getJSONObject("results");
-        JSONObject artistMatches = results.getJSONObject("artistMatches");
-        JSONArray artists = artistmatches.getJSONArray("artist");
     }
 
     /**
@@ -68,7 +57,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
      */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!cursor.moveToPosition(position)){
+        if (!mCursor.moveToPosition(position)){
            return;
         }
         //put items here....
@@ -81,7 +70,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
      */
     @Override
     public int getItemCount() {
-        if (cursor == null){
+        if (mCursor == null){
             return 0;
         }
 
@@ -89,16 +78,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
     }
 
     public void swapCursor (Cursor newCursor){
-        if (cursor != null){
+        if (mCursor != null){
             Log.i(TAG, "swapCursor: Closing the first cursor.");
-            cursor.close();
+            mCursor.close();
         }
         else if (newCursor != null){
             Log.i(TAG, "swapCursor: Forcing the recycleView to refresh.");
             this.notifyDataSetChanged();
         }
         Log.i(TAG, "swapCursor: Swapping cursor.");
-        cursor = newCursor;
+        mCursor = newCursor;
     }
 
     //------------------------------------------
@@ -129,7 +118,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder>{
             }
 
             String toastMessage = "Item #" + clickedPosition + "Clicked";
-            mToast = Toast.makeText(context, toastMessage,  Toast.LENGTH_LONG);
+            mToast = Toast.makeText(mContext, toastMessage,  Toast.LENGTH_LONG);
             mToast.show();
         }
     }
