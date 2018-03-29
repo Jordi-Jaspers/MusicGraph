@@ -2,8 +2,10 @@ package com.example.jordijaspers.musicgraph;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +32,8 @@ public class NetworkUtils {
     public final static String ARTIST = "method=artist";
     public final static String ALBUM = "method=album";
     public final static String TRACK = "method=track";
+
+//    public static String JSONData;
 
 
     /**
@@ -101,4 +105,30 @@ public class NetworkUtils {
             urlConnection.disconnect();
         }
     }
+
+//    /**
+//     * This method returns the entire result from the HTTP response.
+//     * More in UDACITY 2.9
+//     * @param url The URL to fetch the HTTP response from.
+//     * @return The contents of the HTTP response.
+//     * @throws IOException Related to network and stream reading
+//     */
+//    public static void getResponseFromHttpUrl(URL url) throws IOException{
+//        Log.i(TAG, "Opening Internet Connection");
+//        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//        try {
+//            InputStream in = urlConnection.getInputStream();
+//            Log.i(TAG, "Buffering URL-Data");
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+//            String line = "";
+//
+//            while (line != null){
+//                line = bufferedReader.readLine();
+//                JSONData = JSONData + line;
+//            }
+//        } finally {
+//            Log.i(TAG, "Disconnecting Internet Connection");
+//            urlConnection.disconnect();
+//        }
+//    }
 }

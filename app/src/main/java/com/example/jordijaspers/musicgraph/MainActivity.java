@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final int AMOUNT = 100;
+    private String searchResults;
 
     //Declare all Objects for later use
     private Button bArtist;
@@ -83,15 +84,13 @@ public class MainActivity extends AppCompatActivity {
         errorMessage = (TextView) findViewById(R.id.tv_error_message);
         loadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        JSONInputTest test = new JSONInputTest();                                     //TESTEN!!!
-        mCursor = getJSONCursor(test.getJSONInput());
+        mCursor = getJSONCursor(searchResults);
         mAdapter = new Adapter(AMOUNT, this, mCursor);
 
         Log.i(TAG, "onCreate: Setting the Layout & linking the Adapter for the recycleView.");
         mResults = (RecyclerView) findViewById(R.id.rv_artist_results);
         mResults.setLayoutManager(new LinearLayoutManager(this));
         mResults.setAdapter(mAdapter);
-
     }
 
     /**
@@ -161,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
         String input = searchInput.getText().toString();
         URL SearchURL = com.example.jordijaspers.musicgraph.NetworkUtils.buildUrl(input, subjectSearch);
-        String SearchResults = null;
+        searchResults = null;
         new QueryTasks().execute(SearchURL);
     }
 
