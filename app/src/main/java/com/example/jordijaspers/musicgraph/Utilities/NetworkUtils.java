@@ -1,4 +1,4 @@
-package com.example.jordijaspers.musicgraph;
+package com.example.jordijaspers.musicgraph.Utilities;
 
 import android.util.Log;
 

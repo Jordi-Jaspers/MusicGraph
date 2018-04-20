@@ -1,12 +1,11 @@
 package com.example.jordijaspers.musicgraph;
 
+
 import android.content.Context;
-import android.database.Cursor;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,13 +16,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.jordijaspers.musicgraph.Utilities.JSONInputTest;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.example.jordijaspers.musicgraph.Utilities.NetworkUtils;
 
 import java.io.IOException;
 import java.net.URL;
+
+/**
+ * TODO:
+ * Lifecycle hooks (onPause, onResume, …)
+ * Preferences (zie ook config Activity)
+ * Menu (settings, …)
+ * ContentProvider
+ *
+ * Questions:
+ * Multiple adapter for every search engine?
+ * How to download pictures on an asynctask?
+ * Use of Bitmap of images? errors?
+ *
+ */
 
 /**
  * The MainActivity of the app musicBrains.
@@ -31,7 +41,6 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final int AMOUNT = 100;
 
     //Declare all Objects for later use
     private Button bArtist;
@@ -41,9 +50,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView errorMessage;
     private ProgressBar loadingIndicator;
 
-    private Adapter mAdapter;
-    private RecyclerView mResults;
-    private Cursor mCursor;
 
     /**
      * Creates all the object and reference them to their according ID.
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 createSearchQuery("Artist");
             }
         });
+
         bAlbum =(Button) findViewById(R.id.button_album);
         bAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 createSearchQuery("Album");
             }
         });
+
         bSong = (Button) findViewById(R.id.button_song);
         bSong.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,37 +91,6 @@ public class MainActivity extends AppCompatActivity {
         errorMessage = (TextView) findViewById(R.id.tv_error_message);
         loadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        JSONInputTest test = new JSONInputTest();                                     //TESTEN!!!
-        mCursor = getJSONCursor(test.getJSONInput());
-        mAdapter = new Adapter(AMOUNT, this, mCursor);
-
-        Log.i(TAG, "onCreate: Setting the Layout & linking the Adapter for the recycleView.");
-        mResults = (RecyclerView) findViewById(R.id.rv_artist_results);
-        mResults.setLayoutManager(new LinearLayoutManager(this));
-        mResults.setAdapter(mAdapter);
-
-    }
-
-    /**
-     * Parse the input of JSONobject to a readable string.
-     *
-     * @param JSONString JSONString
-     * @throws JSONException Throws exception when null.
-     */
-    public void JSONParse(String JSONString) throws JSONException {
-
-
-    }
-
-    private Cursor getJSONCursor(String response){
-        try{
-            JSONArray array = new JSONArray(response);
-            return new com.s16.data.JSONArrayCursor(array);
-        } catch(JSONException exception)
-        {
-            String ex = exception.getMessage();
-        }
-        return null;
     }
 
     /**
@@ -134,22 +111,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the all the JSON data when prompted.
-     */
-    public void showJSONDataView(){
-        errorMessage.setVisibility(View.INVISIBLE);
-        mResults.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Shows the error message when prompted.
-     */
-    public void showErrorMessage(){
-        errorMessage.setVisibility(View.VISIBLE);
-        mResults.setVisibility(View.INVISIBLE);
-    }
-
-    /**
      * Queries the BuildURl to get the specific API-URL for the JSON Data.
      */
     public void createSearchQuery(String subjectSearch) {
@@ -160,10 +121,13 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 
         String input = searchInput.getText().toString();
-        URL SearchURL = com.example.jordijaspers.musicgraph.NetworkUtils.buildUrl(input, subjectSearch);
+        URL SearchURL = NetworkUtils.buildUrl(input, subjectSearch);
         String SearchResults = null;
         new QueryTasks().execute(SearchURL);
     }
+
+    //------------------------------------------
+    //SubClass starting.
 
     public class QueryTasks extends AsyncTask<URL, Void, String> {
 
@@ -178,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             URL createdURL = urls[0];
             String searchResults = null;
             try{
-                searchResults = com.example.jordijaspers.musicgraph.NetworkUtils.getResponseFromHttpUrl(createdURL);
+                searchResults = NetworkUtils.getResponseFromHttpUrl(createdURL);
             } catch (IOException e){
                 e.printStackTrace();
             }
@@ -189,11 +153,15 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String searchResults) {
             Log.i(TAG, "onPostExecute: Checking Search information");
             loadingIndicator.setVisibility(View.INVISIBLE);
-            if (searchResults == null && !searchResults.equals("")){
-                showJSONDataView();
-            }else {
+            if (searchResults == null || searchResults.equals("")){
                 Log.i(TAG, "onPostExecute: Not Found");
-                showErrorMessage();
+                errorMessage.setVisibility(View.VISIBLE);
+            }else {
+                errorMessage.setVisibility(View.INVISIBLE);
+                Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+                intent.putExtra("JSONresults", searchResults);
+                Log.d(TAG, "onPostExecute() returned: " + searchResults);
+                startActivity(intent);
             }
         }
     }
