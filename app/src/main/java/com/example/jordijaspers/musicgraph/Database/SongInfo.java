@@ -5,11 +5,15 @@ public class SongInfo {
     private String songName;
     private String artistName;
     private String website;
+    private String listeners;
+    private String imageURL;
 
-    public SongInfo(String songName, String artistName, String website) {
+    public SongInfo(String songName, String artistName, String website, String listeners, String imageURL) {
         this.songName = songName;
         this.artistName = artistName;
         this.website = website;
+        this.listeners = listeners;
+        this.imageURL = imageURL;
     }
 
     public String getSongName() {
@@ -22,5 +26,13 @@ public class SongInfo {
 
     public String getWebsite() {
         return website;
+    }
+
+    public String getListeners() {
+        return listeners;
+    }
+
+    public String getImageURL() {
+        return imageURL;
     }
 }

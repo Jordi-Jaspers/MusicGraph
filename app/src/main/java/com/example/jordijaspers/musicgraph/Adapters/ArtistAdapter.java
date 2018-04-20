@@ -1,4 +1,4 @@
-package com.example.jordijaspers.musicgraph;
+package com.example.jordijaspers.musicgraph.Adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jordijaspers.musicgraph.Database.ArtistInfo;
+import com.example.jordijaspers.musicgraph.R;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -64,9 +65,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         ArtistInfo artistInfo = artistInfoList.get(position);
 
-        holder.artistName.setText(artistInfo.getArtistName());
-        holder.listeners.setText(String.valueOf(artistInfo.getListeners()));
-        holder.website.setText(artistInfo.getWebsite());
+        holder.header.setText("Artist: " + artistInfo.getArtistName());
+        holder.subheader1.setText("");
+        holder.subheader2.setText("Listeners: " + artistInfo.getListeners());
 
 //        ImageLoadingTask task = new ImageLoadingTask();
 //        task.execute();
@@ -93,9 +94,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private static final String TAG = "ViewHolder";
 
-        private TextView artistName;
-        private TextView website;
-        private TextView listeners;
+        private TextView header;
+        private TextView subheader1;
+        private TextView subheader2;
         private ImageView imageView;
 
         private Toast mToast;
@@ -104,9 +105,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
             super(itemView);
 
             imageView = itemView.findViewById(R.id.imageView);
-            website = itemView.findViewById(R.id.tv_item_URL);
-            listeners = itemView.findViewById(R.id.tv_item_listeners);
-            artistName = itemView.findViewById(R.id.tv_item_header);
+            header = itemView.findViewById(R.id.tv_item_header);
+            subheader1 = itemView.findViewById(R.id.tv_sub_header1);
+            subheader2 = itemView.findViewById(R.id.tv_sub_header2);
 
             itemView.setOnClickListener(this);
         }

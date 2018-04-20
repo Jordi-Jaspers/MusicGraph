@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView errorMessage;
     private ProgressBar loadingIndicator;
 
+    private String buttonClicked;
 
     /**
      * Creates all the object and reference them to their according ID.
@@ -63,11 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG, "onCreate: Creating Objects And Finding ID.");
 
+        buttonClicked = null;
+
         bArtist = (Button) findViewById(R.id.button_artist);
         bArtist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createSearchQuery("Artist");
+                buttonClicked = "Artist";
+                createSearchQuery(buttonClicked);
             }
         });
 
@@ -75,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
         bAlbum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createSearchQuery("Album");
+                buttonClicked = "Album";
+                createSearchQuery(buttonClicked);
             }
         });
 
@@ -83,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
         bSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createSearchQuery("Song");
+                buttonClicked = "Song";
+                createSearchQuery(buttonClicked);
             }
         });
 
@@ -153,13 +159,18 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String searchResults) {
             Log.i(TAG, "onPostExecute: Checking Search information");
             loadingIndicator.setVisibility(View.INVISIBLE);
-            if (searchResults == null || searchResults.equals("")){
+            if (searchResults == null || searchResults.equals("")) {
                 Log.i(TAG, "onPostExecute: Not Found");
+                errorMessage.setVisibility(View.VISIBLE);
+            }
+            else if(searchInput.equals("") || searchInput == null || searchInput.equals("What are you searching?")){
+                Log.i(TAG, "onPostExecute: blank search engine");
                 errorMessage.setVisibility(View.VISIBLE);
             }else {
                 errorMessage.setVisibility(View.INVISIBLE);
                 Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
                 intent.putExtra("JSONresults", searchResults);
+                intent.putExtra("SearchMethod", buttonClicked);
                 Log.d(TAG, "onPostExecute() returned: " + searchResults);
                 startActivity(intent);
             }

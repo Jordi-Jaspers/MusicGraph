@@ -11,14 +11,14 @@
     android:layout_height="match_parent">
 
     <EditText
-            android:id="@+id/tv_search_input"
-            style="@style/Widget.AppCompat.EditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/what_are_you_searching"
-            android:inputType="textPersonName"
-            android:visibility="visible" />
+        android:id="@+id/tv_search_input"
+        style="@style/Widget.AppCompat.EditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/what_are_you_searching"
+        android:inputType="textPersonName"
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,6 +68,7 @@
         android:padding="16dp"
         android:text="@string/error_message"
         android:textSize="22sp"
+        android:layout_gravity="center_horizontal"
         android:visibility="invisible" />
 
 </LinearLayout>
