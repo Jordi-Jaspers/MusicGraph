@@ -5,4 +5,6 @@
     <string name="song">Song</string>
     <string name="what_are_you_searching">What are you searching?</string>
     <string name="error_message">Please do not leave the search menu blank.</string>
+    <string name="title_activity_settings">Settings</string>
+
 </resources>

@@ -12,37 +12,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.jordijaspers.musicgraph.Database.ArtistInfo;
+import com.example.jordijaspers.musicgraph.Database.TopArtistsInfo;
 import com.example.jordijaspers.musicgraph.DetailActivity;
 import com.example.jordijaspers.musicgraph.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Adapter Class for the recycleView
- */
-public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder> {
+public class TopArtistsAdapter extends RecyclerView.Adapter<TopArtistsAdapter.ViewHolder> {
 
-    private static final String TAG = "ArtistAdapter";
+    private static final String TAG = "TopArtistsAdapter";
     private Context mContext;
 
-    private List<ArtistInfo> artistInfoList;
+    private List<TopArtistsInfo> topArtistsInfoList;
 
 
     /**
      * Constructor of the adapter
      */
-    public ArtistAdapter(Context mContext, List<ArtistInfo> artistInfoList) {
+    public TopArtistsAdapter(Context mContext, List<TopArtistsInfo> topArtistsInfoList) {
         this.mContext = mContext;
-        this.artistInfoList = artistInfoList;
+        this.topArtistsInfoList = topArtistsInfoList;
     }
 
     /**
      * Creates the viewHolder for the adapter.
      *
      * @param viewGroup viewgroup
-     * @param viewType viewtype
+     * @param viewType  viewtype
      * @return the created viewHolder.
      */
     @Override
@@ -56,23 +53,22 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     /**
      * binds the position of the holder.
      *
-     * @param holder what holder to bind it to.
+     * @param holder   what holder to bind it to.
      * @param position index of the item.
      */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        ArtistInfo artistInfo = artistInfoList.get(position);
+        TopArtistsInfo topArtistsInfo = topArtistsInfoList.get(position);
 
-        holder.header.setText(artistInfo.getArtistName());
-        holder.subheader1.setText("Listeners: " + artistInfo.getListeners());
-        holder.subheader2.setText("");
-
+        holder.header.setText(topArtistsInfo.getArtistName());
+        holder.subheader1.setText("Playcount: " + topArtistsInfo.getPlayCount());
+        holder.subheader2.setText("Ranked : #" + topArtistsInfo.getRank());
         holder.imageView.setImageResource(R.drawable.no_image);
 
-        if(!artistInfo.getImageURL().isEmpty()) {
-            Picasso.with(mContext).load(artistInfo.getImageURL()).into(holder.imageView);
+        //failsafe for nullpointer exception.
+        if(!topArtistsInfo.getImageURL().isEmpty()) {
+            Picasso.with(mContext).load(topArtistsInfo.getImageURL()).into(holder.imageView);
         }
-
     }
 
     /**
@@ -82,7 +78,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
      */
     @Override
     public int getItemCount() {
-        return artistInfoList.size();
+        return topArtistsInfoList.size();
     }
 
     //------------------------------------------
@@ -109,12 +105,12 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
             subheader1 = itemView.findViewById(R.id.tv_sub_header1);
             subheader2 = itemView.findViewById(R.id.tv_sub_header2);
 
+
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-
             if (mToast != null){
                 mToast.cancel();
             }
@@ -140,5 +136,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
+
     }
 }

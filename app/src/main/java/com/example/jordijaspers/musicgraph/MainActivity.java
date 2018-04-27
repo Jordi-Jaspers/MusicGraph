@@ -1,19 +1,18 @@
 package com.example.jordijaspers.musicgraph;
 
-
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jordijaspers.musicgraph.Utilities.NetworkUtils;
@@ -21,36 +20,18 @@ import com.example.jordijaspers.musicgraph.Utilities.NetworkUtils;
 import java.io.IOException;
 import java.net.URL;
 
-/**
- * TODO:
- * Lifecycle hooks (onPause, onResume, …)
- * Preferences (zie ook config Activity)
- * Menu (settings, …)
- * ContentProvider
- *
- * Questions:
- * Multiple adapter for every search engine?
- * How to download pictures on an asynctask?
- * Use of Bitmap of images? errors?
- *
- */
-
-/**
- * The MainActivity of the app musicBrains.
- */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     private static final String TAG = "MainActivity";
 
     //Declare all Objects for later use
-    private Button bArtist;
-    private Button bAlbum;
-    private Button bSong;
-    private EditText searchInput;
-    private TextView errorMessage;
-    private ProgressBar loadingIndicator;
+    private Button bTopArtist;
+    private Button bSearch;
+    private Button bTopSong;
 
     private String buttonClicked;
+    private Boolean CONNECTED;
+    private Context mContext;
 
     /**
      * Creates all the object and reference them to their according ID.
@@ -63,40 +44,81 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.i(TAG, "onCreate: Creating Objects And Finding ID.");
+        mContext = getApplicationContext();
 
-        buttonClicked = null;
-
-        bArtist = (Button) findViewById(R.id.button_artist);
-        bArtist.setOnClickListener(new View.OnClickListener() {
+        bSearch = (Button) findViewById(R.id.button_search);
+        bSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonClicked = "Artist";
-                createSearchQuery(buttonClicked);
+                if (isNetworkAvailable()){
+                    Intent intentArtist = new Intent(MainActivity.this, SearchActivity.class);
+                    startActivity(intentArtist);
+                }
+                else{
+                    Toast.makeText(mContext, "No Internet Connection: Search function Not Available", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        bAlbum =(Button) findViewById(R.id.button_album);
-        bAlbum.setOnClickListener(new View.OnClickListener() {
+        bTopArtist = (Button) findViewById(R.id.button_top_artist);
+        bTopArtist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonClicked = "Album";
-                createSearchQuery(buttonClicked);
+                buttonClicked = "TopArtists";
+                if (!isNetworkAvailable()){
+                    CONNECTED = false;
+                    Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+                    intent.putExtra("Connected", CONNECTED);
+                    intent.putExtra("SearchMethod", buttonClicked);
+                    startActivity(intent);
+                }else {
+                    CONNECTED = true;
+                    Toast.makeText(mContext, "Getting Top Artists...", Toast.LENGTH_SHORT).show();
+                    URL SearchURL = NetworkUtils.getTop(buttonClicked);
+                    new QueryTasks().execute(SearchURL);
+                }
             }
         });
 
-        bSong = (Button) findViewById(R.id.button_song);
-        bSong.setOnClickListener(new View.OnClickListener() {
+        bTopSong = (Button) findViewById(R.id.button_top_song);
+        bTopSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonClicked = "Song";
-                createSearchQuery(buttonClicked);
+                buttonClicked = "TopSongs";
+                if (!isNetworkAvailable()){
+                    CONNECTED = false;
+                    Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+                    intent.putExtra("Connected", CONNECTED);
+                    intent.putExtra("SearchMethod", buttonClicked);
+                    startActivity(intent);
+                }
+                else {
+                    CONNECTED = true;
+                    Toast.makeText(mContext, "Getting Top Songs...", Toast.LENGTH_SHORT).show();
+                    URL SearchURL = NetworkUtils.getTop(buttonClicked);
+                    new QueryTasks().execute(SearchURL);
+                }
             }
         });
+    }
 
-        searchInput = (EditText) findViewById(R.id.tv_search_input);
-        errorMessage = (TextView) findViewById(R.id.tv_error_message);
-        loadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
+
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connectivityManager != null;
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**
@@ -107,29 +129,20 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_items, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_items, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.action_settings){
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Queries the BuildURl to get the specific API-URL for the JSON Data.
-     */
-    public void createSearchQuery(String subjectSearch) {
-        Log.i(TAG, "createSearchQuery: Searching...");
-
-        Context context = getApplicationContext();
-        String message = "Searching...";
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-
-        String input = searchInput.getText().toString();
-        URL SearchURL = NetworkUtils.buildUrl(input, subjectSearch);
-        String SearchResults = null;
-        new QueryTasks().execute(SearchURL);
     }
 
     //------------------------------------------
@@ -140,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            loadingIndicator.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -158,22 +170,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String searchResults) {
             Log.i(TAG, "onPostExecute: Checking Search information");
-            loadingIndicator.setVisibility(View.INVISIBLE);
-            if (searchResults == null || searchResults.equals("")) {
-                Log.i(TAG, "onPostExecute: Not Found");
-                errorMessage.setVisibility(View.VISIBLE);
-            }
-            else if(searchInput.equals("") || searchInput == null || searchInput.equals("What are you searching?")){
-                Log.i(TAG, "onPostExecute: blank search engine");
-                errorMessage.setVisibility(View.VISIBLE);
-            }else {
-                errorMessage.setVisibility(View.INVISIBLE);
-                Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
-                intent.putExtra("JSONresults", searchResults);
-                intent.putExtra("SearchMethod", buttonClicked);
-                Log.d(TAG, "onPostExecute() returned: " + searchResults);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+            intent.putExtra("JSONresults", searchResults);
+            intent.putExtra("SearchMethod", buttonClicked);
+            intent.putExtra("Connected", CONNECTED);
+            Log.d(TAG, "onPostExecute() returned: " + searchResults);
+            startActivity(intent);
         }
     }
 }

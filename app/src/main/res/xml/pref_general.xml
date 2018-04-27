@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:id="@+id/switch_night"
+        android:defaultValue="true"
+        android:key="example_switch"
+        android:summary="Recommendation to relieve the strain on your eyes by changing to a black background."
+        android:title="Night Mode" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="Jordi Jaspers"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Display UserName" />
+
+
+</PreferenceScreen>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Settings">
+        <Preference
+            android:fragment="com.example.jordijaspers.musicgraph.Utilities.SettingsFragment"
+            android:title="General"
+            android:key="General"
+            android:icon="@drawable/ic_info_black_24dp"/>
+
+        <Preference
+            android:fragment="com.example.jordijaspers.musicgraph.Utilities.SettingsFragment"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:key="Notifications"
+            android:title="Notifications" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Connectivity">
+        <Preference
+            android:fragment="com.example.jordijaspers.musicgraph.Utilities.SettingsFragment"
+            android:icon="@drawable/ic_sync_black_24dp"
+            android:key="Sharing"
+            android:title= "Sharing"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

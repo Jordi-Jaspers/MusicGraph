@@ -9,36 +9,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.jordijaspers.musicgraph.Database.AlbumInfo;
+import com.example.jordijaspers.musicgraph.Database.TopSongsInfo;
 import com.example.jordijaspers.musicgraph.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Adapter Class for the recycleView
- */
-public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
+public class TopSongsAdapter extends RecyclerView.Adapter<TopSongsAdapter.ViewHolder> {
 
-    private static final String TAG = "ArtistAdapter";
+    private static final String TAG = "TopSongsAdapter";
     private Context mContext;
 
-    private List<AlbumInfo> albumInfoList;
+    private List<TopSongsInfo> topSongsInfoList;
 
 
     /**
      * Constructor of the adapter
      */
-    public AlbumAdapter(Context mContext, List<AlbumInfo> albumInfoList) {
+    public TopSongsAdapter(Context mContext, List<TopSongsInfo> topSongsInfoList) {
         this.mContext = mContext;
-        this.albumInfoList = albumInfoList;
+        this.topSongsInfoList = topSongsInfoList;
     }
 
     /**
      * Creates the viewHolder for the adapter.
      *
      * @param viewGroup viewgroup
-     * @param viewType viewtype
+     * @param viewType  viewtype
      * @return the created viewHolder.
      */
     @Override
@@ -52,23 +49,24 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     /**
      * binds the position of the holder.
      *
-     * @param holder what holder to bind it to.
+     * @param holder   what holder to bind it to.
      * @param position index of the item.
      */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        AlbumInfo albumInfo = albumInfoList.get(position);
+        TopSongsInfo topSongsInfo = topSongsInfoList.get(position);
 
-        holder.header.setText(albumInfo.getAlbumName());
-        holder.subheader1.setText("Artist: " + albumInfo.getArtistName());
-        holder.subheader2.setText("Streams: " + albumInfo.getStreamable());
-
+        holder.header.setText(topSongsInfo.getSongName());
+        holder.subheader1.setText("Playcount: " + topSongsInfo.getPlayCount());
+        holder.subheader2.setText("Ranked: #" + topSongsInfo.getRank());
+        holder.subheader3.setText("Artist: " + topSongsInfo.getArtistName());
         holder.imageView.setImageResource(R.drawable.no_image);
 
         //failsafe for nullpointer exception.
-        if(!albumInfo.getImageURL().isEmpty()) {
-            Picasso.with(mContext).load(albumInfo.getImageURL()).into(holder.imageView);
+        if(!topSongsInfo.getImageURL().isEmpty()) {
+            Picasso.with(mContext).load(topSongsInfo.getImageURL()).into(holder.imageView);
         }
+
     }
 
     /**
@@ -78,7 +76,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
      */
     @Override
     public int getItemCount() {
-        return albumInfoList.size();
+        return topSongsInfoList.size();
     }
 
     //------------------------------------------
@@ -87,12 +85,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     /**
      * Gets the Layout to bind the items to.
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder{
         private static final String TAG = "ViewHolder";
 
         private TextView header;
         private TextView subheader1;
         private TextView subheader2;
+        private TextView subheader3;
         private ImageView imageView;
 
         private Toast mToast;
@@ -104,8 +103,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             header = itemView.findViewById(R.id.tv_item_header);
             subheader1 = itemView.findViewById(R.id.tv_sub_header1);
             subheader2 = itemView.findViewById(R.id.tv_sub_header2);
+            subheader3 = itemView.findViewById(R.id.tv_sub_header3);
 
         }
-
     }
 }

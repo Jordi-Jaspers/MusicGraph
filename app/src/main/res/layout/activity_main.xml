@@ -1,75 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingBottom="16dp"
-    android:paddingTop="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/tv_search_input"
-        style="@style/Widget.AppCompat.EditText"
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:adjustViewBounds="false"
+        android:background="@color/colorPrimary"
+        app:srcCompat="@mipmap/ic_launcher_foreground"
+        tools:ignore="VectorDrawableCompat" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="match_parent"
+        android:layout_height="247dp"
+        android:layout_weight="1"
+        app:srcCompat="@color/cardview_dark_background" />
+
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/what_are_you_searching"
-        android:inputType="textPersonName"
-        android:visibility="visible" />
+        android:background="@color/cardview_dark_background"
+        android:gravity="center_horizontal"
+        android:text="MusicGraph"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="40sp"
+        tools:text="MusicGraph" />
+
+    <ImageView
+        android:id="@+id/imageView8"
+        android:layout_width="match_parent"
+        android:layout_height="252dp"
+        android:layout_weight="1"
+        app:srcCompat="@color/cardview_dark_background" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="247dp"
+        android:layout_weight="1"
+        android:background="@color/cardview_dark_background"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button_artist"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="126dp"
+            android:id="@+id/button_top_artist"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/artist"
-            android:visibility="visible" />
+            android:text="Top 50 artists" />
 
         <Button
-            android:id="@+id/button_album"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="126dp"
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/album"
-            android:visibility="visible" />
+            android:text="Search" />
 
         <Button
-            android:id="@+id/button_song"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="126dp"
+            android:id="@+id/button_top_song"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/song"
-            android:visibility="visible" />
+            android:text="Top 50 songs" />
 
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/pb_loading_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="42dp"
-        android:visibility="invisible" />
-
-    <TextView
-        android:id="@+id/tv_error_message"
-        android:layout_width="match_parent"
-        android:layout_height="78dp"
-        android:layout_weight="1"
-        android:padding="16dp"
-        android:text="@string/error_message"
-        android:textSize="22sp"
-        android:layout_gravity="center_horizontal"
-        android:visibility="invisible" />
-
 </LinearLayout>
-

@@ -1,23 +1,31 @@
 package com.example.jordijaspers.musicgraph;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.jordijaspers.musicgraph.Adapters.AlbumAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.ArtistAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.SongAdapter;
+import com.example.jordijaspers.musicgraph.Adapters.TopArtistsAdapter;
+import com.example.jordijaspers.musicgraph.Adapters.TopSongsAdapter;
 import com.example.jordijaspers.musicgraph.Database.AlbumInfo;
 import com.example.jordijaspers.musicgraph.Database.ArtistInfo;
 import com.example.jordijaspers.musicgraph.Database.SongInfo;
+import com.example.jordijaspers.musicgraph.Database.TopArtistsInfo;
+import com.example.jordijaspers.musicgraph.Database.TopSongsInfo;
+import com.example.jordijaspers.musicgraph.Utilities.DataDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,12 +34,19 @@ public class ResultsActivity extends AppCompatActivity {
     private static final int AMOUNT = 30;
     private static final String TAG = "ResultsActivity";
     private String buttonClicked;
+    private Boolean CONNECTED;
+
+    Intent intent;
 
     private RecyclerView recyclerView;
+    public static SQLiteDatabase mDb;
+    private DataDbHelper dbHelper;
 
     private List<ArtistInfo> artistInfoList;
     private List<AlbumInfo> albumInfoList;
     private List<SongInfo> songInfoList;
+    private List<TopArtistsInfo> topArtistsInfoList;
+    private List<TopSongsInfo> topSongsInfoList;
 
     /**
      * Creates all the object and reference them to their according ID.
@@ -47,17 +62,24 @@ public class ResultsActivity extends AppCompatActivity {
         artistInfoList = new ArrayList<>();
         albumInfoList = new ArrayList<>();
         songInfoList = new ArrayList<>();
+        topArtistsInfoList = new ArrayList<>();
+        topSongsInfoList = new ArrayList<>();
 
-        Intent intentButton = getIntent();
-        buttonClicked = intentButton.getStringExtra("SearchMethod");
+        dbHelper = new DataDbHelper(this);
+
+        intent = getIntent();
+        buttonClicked = intent.getStringExtra("SearchMethod");
+        CONNECTED = intent.getBooleanExtra("Connected", true);
 
         Log.i(TAG, "OnCreate: Setting the Layout & linking the Adapter for the recycleView.");
         recyclerView = (RecyclerView) findViewById(R.id.rv_results);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        Intent intentResults = getIntent();
-        String JSONString = intentResults.getStringExtra("JSONresults");
+        String JSONString = null;
+        if (intent.getStringExtra("JSONresults") != null){
+            JSONString = intent.getStringExtra("JSONresults");
+        }
 
         switch(buttonClicked){
             case "Artist":
@@ -92,6 +114,60 @@ public class ResultsActivity extends AppCompatActivity {
                 SongAdapter mSongAdapter = new SongAdapter(this, songInfoList);
                 recyclerView.setAdapter(mSongAdapter);
                 break;
+
+            case "TopArtists":
+
+                if (!CONNECTED){
+                    mDb = dbHelper.getReadableDatabase();
+                    dbHelper.getTop50ArtistsFromDb(mDb, topArtistsInfoList);
+                    TopArtistsAdapter mTopArtistsAdapter = new TopArtistsAdapter(this, topArtistsInfoList);
+                    recyclerView.setAdapter(mTopArtistsAdapter);
+
+                    if(topSongsInfoList.isEmpty())
+                        Toast.makeText(this, "No Internet Connection, please try again.", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(this, "Not Live Data: Internet Connection Error.", Toast.LENGTH_LONG).show();
+
+                    mDb.close();
+                    break;
+                }else {
+                    try {
+                        JSONParseTopArtists(JSONString);
+                    } catch (JSONException exception) {
+                        Log.e(TAG, "JSONParse: Exception Error: ", exception);
+                    }
+                    TopArtistsAdapter mTopArtistsAdapter = new TopArtistsAdapter(this, topArtistsInfoList);
+                    recyclerView.setAdapter(mTopArtistsAdapter);
+                    break;
+                }
+
+            case "TopSongs":
+
+                if(!CONNECTED){
+                    mDb = dbHelper.getReadableDatabase();
+                    dbHelper.getTop50SongsFromDb(mDb, topSongsInfoList);
+                    TopSongsAdapter mTopSongsAdapter = new TopSongsAdapter(this, topSongsInfoList);
+                    recyclerView.setAdapter(mTopSongsAdapter);
+
+                    if(topSongsInfoList.isEmpty())
+                        Toast.makeText(this, "No Internet Connection, please try again.", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(this, "Not Live Data: Internet Connection Error.", Toast.LENGTH_LONG).show();
+
+                    mDb.close();
+                    break;
+                }else {
+                    try {
+                        JSONParseTopSongs(JSONString);
+                    } catch (JSONException exception) {
+                        Log.e(TAG, "JSONParse: JSONException Error: ", exception);
+                    } catch (IOException exception) {
+                        Log.e(TAG, "JSONParse: IOException Error: ", exception);
+                    }
+                    TopSongsAdapter mTopSongsAdapter = new TopSongsAdapter(this, topSongsInfoList);
+                    recyclerView.setAdapter(mTopSongsAdapter);
+                    break;
+                }
 
             default:
                 Log.i(TAG, "onCreate: No possible button! Try again!");
@@ -160,6 +236,69 @@ public class ResultsActivity extends AppCompatActivity {
                 JSONArray imageArray = JSONSong.getJSONArray("image");
                 songInfoList.add(new SongInfo(JSONSong.getString("name"), JSONSong.getString("artist"), JSONSong.getString("url"), JSONSong.getString("listeners"), imageArray.getJSONObject(3).getString("#text")));
             }
+        } catch(JSONException exception) {
+            Log.e(TAG, "JSONParse: JSONException Error: ", exception);
+        }
+    }
+
+    /**
+     * Parse the input of JSONobject to a readable string.
+     *
+     * @param JSONString JSONString
+     * @throws JSONException Throws exception when null.
+     */
+    public void JSONParseTopArtists(String JSONString) throws JSONException {
+        Log.i(TAG, "JSONParse: Parsing JSON data to object.");
+        try{
+            JSONObject tempObject = new JSONObject(JSONString).getJSONObject("artists");
+            JSONArray array = tempObject.getJSONArray("artist");
+
+            for (int i = 0 ;i < 50; i++){
+                JSONObject JSONTopArtists = array.getJSONObject(i);
+                JSONArray imageArray = JSONTopArtists.getJSONArray("image");
+                topArtistsInfoList.add(new TopArtistsInfo(JSONTopArtists.getString("name"),
+                        JSONTopArtists.getString("listeners"),
+                        JSONTopArtists.getString("playcount"),
+                        (i+1),
+                        JSONTopArtists.getString("url"),
+                        imageArray.getJSONObject(3).getString("#text")));
+            }
+        } catch(JSONException exception) {
+            Log.e(TAG, "JSONParse: JSONException Error: ", exception);
+        }
+        mDb = dbHelper.getWritableDatabase();
+        dbHelper.readTop50ArtistsToDb(mDb, topArtistsInfoList);
+        mDb.close();
+    }
+
+    /**
+     * Parse the input of JSONobject to a readable string.
+     *
+     * @param JSONString JSONString
+     * @throws JSONException Throws exception when null.
+     */
+    public void JSONParseTopSongs(String JSONString) throws JSONException, IOException {
+        Log.i(TAG, "JSONParse: Parsing JSON data to object.");
+        try{
+            JSONObject tempObject = new JSONObject(JSONString).getJSONObject("tracks");
+            JSONArray array = tempObject.getJSONArray("track");
+
+            for (int i = 0 ;i < 50; i++){
+                JSONObject JSONTopSongs = array.getJSONObject(i);
+                JSONArray imageArray = JSONTopSongs.getJSONArray("image");
+                topSongsInfoList.add(new TopSongsInfo(
+                        JSONTopSongs.getString("name"),
+                        JSONTopSongs.getJSONObject("artist").getString("name"),
+                        JSONTopSongs.getString("listeners"), JSONTopSongs.getString("playcount"),
+                        (i+1),
+                        JSONTopSongs.getString("url"),
+                        imageArray.getJSONObject(3).getString("#text")));
+            }
+
+            mDb = dbHelper.getWritableDatabase();
+            dbHelper.readTop50SongsToDb(mDb, topSongsInfoList);
+            mDb.close();
+
         } catch(JSONException exception) {
             Log.e(TAG, "JSONParse: JSONException Error: ", exception);
         }
