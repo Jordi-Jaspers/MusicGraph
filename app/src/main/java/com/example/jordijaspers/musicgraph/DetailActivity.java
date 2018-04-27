@@ -99,7 +99,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isNetworkAvailable()){
                     CONNECTED = true;
-
+                    //nog maken!
                 }
                 else{
                     CONNECTED = false;
@@ -138,7 +138,7 @@ public class DetailActivity extends AppCompatActivity {
     public void createSearchQuery() {
         Log.i(TAG, "createSearchQuery: Getting Info");
 
-        Toast.makeText(mContext, "Getting Info", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "Getting Info...", Toast.LENGTH_SHORT).show();
 
         URL[] searchURLs = new URL[2];
         searchURLs[0] = NetworkUtils.getArtistInfoURL(artistName);

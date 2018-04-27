@@ -119,8 +119,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
                 mToast.cancel();
             }
 
-            String toastMessage = "Artist" + header.getText() + " Clicked";
-            mToast = Toast.makeText(mContext, toastMessage,  Toast.LENGTH_LONG);
+            String toastMessage = "Artist " + header.getText() + " Clicked";
+            mToast = Toast.makeText(mContext, toastMessage,  Toast.LENGTH_SHORT);
             mToast.show();
 
             if(isNetworkAvailable()) {

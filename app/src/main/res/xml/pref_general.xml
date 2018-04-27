@@ -1,21 +1,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
-        android:id="@+id/switch_night"
-        android:defaultValue="true"
-        android:key="example_switch"
-        android:summary="Recommendation to relieve the strain on your eyes by changing to a black background."
-        android:title="Night Mode" />
+        android:defaultValue="false"
+        android:key="nightMode"
+        android:summary="@string/pref_description_night_recommendation"
+        android:title="@string/pref_title_night_mode" />
 
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue="Jordi Jaspers"
+        android:defaultValue="@string/pref_default_display_name"
         android:inputType="textCapWords"
-        android:key="example_text"
+        android:key="nameChanger"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Display UserName" />
-
+        android:title="@string/pref_title_user_info" />
 
 </PreferenceScreen>
