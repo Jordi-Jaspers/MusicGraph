@@ -11,11 +11,13 @@ import android.widget.Toast;
 
 import com.example.jordijaspers.musicgraph.Adapters.AlbumAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.ArtistAdapter;
+import com.example.jordijaspers.musicgraph.Adapters.SimilarArtistAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.SongAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.TopArtistsAdapter;
 import com.example.jordijaspers.musicgraph.Adapters.TopSongsAdapter;
 import com.example.jordijaspers.musicgraph.Database.AlbumInfo;
 import com.example.jordijaspers.musicgraph.Database.ArtistInfo;
+import com.example.jordijaspers.musicgraph.Database.SimilarArtistInfo;
 import com.example.jordijaspers.musicgraph.Database.SongInfo;
 import com.example.jordijaspers.musicgraph.Database.TopArtistsInfo;
 import com.example.jordijaspers.musicgraph.Database.TopSongsInfo;
@@ -36,7 +38,7 @@ public class ResultsActivity extends AppCompatActivity {
     private String buttonClicked;
     private Boolean CONNECTED;
 
-    Intent intent;
+    private Intent mIntent;
 
     private RecyclerView recyclerView;
     public static SQLiteDatabase mDb;
@@ -47,6 +49,7 @@ public class ResultsActivity extends AppCompatActivity {
     private List<SongInfo> songInfoList;
     private List<TopArtistsInfo> topArtistsInfoList;
     private List<TopSongsInfo> topSongsInfoList;
+    private List<SimilarArtistInfo> similarArtistInfoList;
 
     /**
      * Creates all the object and reference them to their according ID.
@@ -64,12 +67,13 @@ public class ResultsActivity extends AppCompatActivity {
         songInfoList = new ArrayList<>();
         topArtistsInfoList = new ArrayList<>();
         topSongsInfoList = new ArrayList<>();
+        similarArtistInfoList = new ArrayList<>();
 
         dbHelper = new DataDbHelper(this);
 
-        intent = getIntent();
-        buttonClicked = intent.getStringExtra("SearchMethod");
-        CONNECTED = intent.getBooleanExtra("Connected", true);
+        mIntent = getIntent();
+        buttonClicked = mIntent.getStringExtra("SearchMethod");
+        CONNECTED = mIntent.getBooleanExtra("Connected", true);
 
         Log.i(TAG, "OnCreate: Setting the Layout & linking the Adapter for the recycleView.");
         recyclerView = (RecyclerView) findViewById(R.id.rv_results);
@@ -77,8 +81,8 @@ public class ResultsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         String JSONString = null;
-        if (intent.getStringExtra("JSONresults") != null){
-            JSONString = intent.getStringExtra("JSONresults");
+        if (mIntent.getStringExtra("JSONresults") != null){
+            JSONString = mIntent.getStringExtra("JSONresults");
         }
 
         switch(buttonClicked){
@@ -168,6 +172,18 @@ public class ResultsActivity extends AppCompatActivity {
                     recyclerView.setAdapter(mTopSongsAdapter);
                     break;
                 }
+
+            case "SimilarArtist":
+                try {
+                    JSONParseSimilarArtist(JSONString);
+                } catch (JSONException exception) {
+                    Log.e(TAG, "JSONParse: JSONException Error: ", exception);
+                } catch (IOException exception) {
+                    Log.e(TAG, "JSONParse: IOException Error: ", exception);
+                }
+                SimilarArtistAdapter mSimilarArtistAdapter = new SimilarArtistAdapter(this, similarArtistInfoList);
+                recyclerView.setAdapter(mSimilarArtistAdapter);
+                break;
 
             default:
                 Log.i(TAG, "onCreate: No possible button! Try again!");
@@ -303,4 +319,27 @@ public class ResultsActivity extends AppCompatActivity {
             Log.e(TAG, "JSONParse: JSONException Error: ", exception);
         }
     }
+
+    /**
+     * Parse the input of JSONobject to a readable string.
+     *
+     * @param JSONString JSONString
+     * @throws JSONException Throws exception when null.
+     */
+    public void JSONParseSimilarArtist(String JSONString) throws JSONException, IOException {
+        Log.i(TAG, "JSONParse: Parsing JSON data to object.");
+        try{
+            JSONArray artistArray = new JSONObject(JSONString).getJSONArray("artist");
+
+            for (int i = 0 ;i < artistArray.length(); i++) {
+                similarArtistInfoList.add(new SimilarArtistInfo(
+                        artistArray.getJSONObject(i).getString("name"),
+                        String.valueOf(i + 1),
+                        artistArray.getJSONObject(i).getJSONArray("image").getJSONObject(3).getString("#text")));
+            }
+        } catch(JSONException exception) {
+            Log.e(TAG, "JSONParse: JSONException Error: ", exception);
+        }
+    }
+
 }

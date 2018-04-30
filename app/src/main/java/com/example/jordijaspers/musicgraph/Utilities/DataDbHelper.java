@@ -73,6 +73,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
     }
 
     public void readTop50SongsToDb(SQLiteDatabase db, List<TopSongsInfo> topSongsInfoList) {
+
         for (int i = 0; i < topSongsInfoList.size(); ++i) {
             TopSongsInfo topSongsInfo = topSongsInfoList.get(i);
             ContentValues contentValues = new ContentValues();

@@ -55,6 +55,7 @@ public class DetailActivity extends AppCompatActivity {
     private Boolean CONNECTED;
     private Context mContext;
     private Intent mIntent;
+    private String buttonClicked;
 
     private JSONObject similarArtists;
     private String websiteURL;
@@ -99,7 +100,14 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isNetworkAvailable()){
                     CONNECTED = true;
-                    //nog maken!
+                    buttonClicked = "SimilarArtist";
+
+                    Intent intentsimilar = new Intent(mContext, ResultsActivity.class);
+                    intentsimilar.putExtra("JSONresults", similarArtists.toString());
+                    intentsimilar.putExtra("Connected", CONNECTED);
+                    intentsimilar.putExtra("SearchMethod", buttonClicked);
+
+                    startActivity(intentsimilar);
                 }
                 else{
                     CONNECTED = false;
@@ -124,6 +132,12 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -137,8 +151,6 @@ public class DetailActivity extends AppCompatActivity {
      */
     public void createSearchQuery() {
         Log.i(TAG, "createSearchQuery: Getting Info");
-
-        Toast.makeText(mContext, "Getting Info...", Toast.LENGTH_SHORT).show();
 
         URL[] searchURLs = new URL[2];
         searchURLs[0] = NetworkUtils.getArtistInfoURL(artistName);
@@ -194,7 +206,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 tv_Title.setText(tempObject.getString("name"));
                 tv_Bio.setText("published on: " + tempObject.getJSONObject("bio").getString("published" )+ "\n" + "\n" +
-                        tempObject.getJSONObject("bio").getString("summary"));
+                        tempObject.getJSONObject("bio").getString("content"));
 
                 websiteURL = tempObject.getString("url");
                 similarArtists = tempObject.getJSONObject("similar");
