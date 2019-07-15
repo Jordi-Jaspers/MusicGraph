@@ -1,4 +1,4 @@
-# RetroCalculator
+# Musicgraph
 
 This is a simple Music search Android application.
 
